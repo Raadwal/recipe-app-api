@@ -26,4 +26,32 @@ services:
     # Command we use to run the service, but we can override that command when run Docker, compose, run
     # Its default command when we don't specify anything
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      # db is the name of the service, so we can use it to connect to database
+      - DB_HOST=db
+      # Credentials should match with credentials in database
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    # It tells docker-compose that the app service depends on db service
+    # It will wait for db service to start before starting app service
+    depends_on:
+      - db
+      
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    # Initial database configuration for our server. After started it will create database: devdb and user: devuser
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+
+# Docker will create volume locally, so data in the database won't be cleared every time docker starts
+volumes:
+  dev-db-data:

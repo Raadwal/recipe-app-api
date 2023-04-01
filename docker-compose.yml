@@ -1,0 +1,29 @@
+# Version of docker compose syntax that we are using
+version: "3.9"
+
+# Docker compose file typically consist of one or more services required to run application
+
+services:
+  # Name of our service
+  app:
+    # Building docker file in the current directory
+    build:
+      # . means current directory
+      context: .
+      # If we are running this docker compose (used for development only) it's created argument DEV and sets its value to true
+      args:
+        - DEV=true
+    # Maps port 8000 on local machine to port 8000 inside Docker container
+    ports:
+      - "8000:8000"
+    # Way of mapping directories from our system into the Docker container
+    # We are mapping ./app from our system to /app in the Docker container
+    # We do it because we want to the updates we make to our code in our local project to be reflected in the running container in real time
+    # Thanks to that we don't need to rebuild our container every time we make changes in the code
+    # It's works two ways
+    volumes:
+      - ./app:/app
+    # Command we use to run the service, but we can override that command when run Docker, compose, run
+    # Its default command when we don't specify anything
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

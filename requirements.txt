@@ -1,0 +1,2 @@
+Django>=3.2.4,<3.3 # Django version can be equal or higher than 3.2.4, but it a has to be lower than 3.3
+djangorestframework>=3.12.4,<3.13
